@@ -1,0 +1,8 @@
+apiVersion: capturer.stable.example.com/v1alpha1
+kind: Output
+metadata:
+  name: deployment-output
+spec:
+  github:
+    repository: hoge
+    filePath: fuga
