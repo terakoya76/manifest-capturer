@@ -66,6 +66,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controller.OutputReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("OutputController"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "OutputController")
+		os.Exit(1)
+	}
 	if err = (&controller.ConfigMapReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("ConfigMapController"),

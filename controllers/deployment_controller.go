@@ -72,11 +72,12 @@ func (r *DeploymentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, nil
 	}
 
+	outputName := c.Spec.Output
 	var output capturerv1alpha1.Output
 	if err = r.Get(context.TODO(),
 		types.NamespacedName{
 			Namespace: req.Namespace,
-			Name:      c.Spec.Output,
+			Name:      outputName,
 		},
 		&output,
 	); err != nil {
@@ -95,7 +96,7 @@ func (r *DeploymentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	}
 
 	log.Info(string(manifest))
-	if err := output.GetPublisher().Publish(manifest); err != nil {
+	if err := output.GetPublisher().Publish(outputName, manifest); err != nil {
 		log.Error(err, "unable to publish manifest")
 		return ctrl.Result{}, err
 	}

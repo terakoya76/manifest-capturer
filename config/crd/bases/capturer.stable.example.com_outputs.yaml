@@ -37,15 +37,41 @@ spec:
             github:
               description: GitHubOutput defines the spec for integrating with GitHub
               properties:
-                filePath:
-                  format: string
-                  type: string
-                repository:
+                config:
+                  properties:
+                    author:
+                      properties:
+                        email:
+                          format: string
+                          type: string
+                        name:
+                          format: string
+                          type: string
+                      required:
+                      - email
+                      - name
+                      type: object
+                    baseBranch:
+                      format: string
+                      type: string
+                    manifestPath:
+                      format: string
+                      type: string
+                    repositoryUrl:
+                      format: string
+                      type: string
+                  required:
+                  - author
+                  - baseBranch
+                  - manifestPath
+                  - repositoryUrl
+                  type: object
+                localFilePath:
                   format: string
                   type: string
               required:
-              - filePath
-              - repository
+              - config
+              - localFilePath
               type: object
           required:
           - github

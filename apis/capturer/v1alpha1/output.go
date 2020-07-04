@@ -20,7 +20,8 @@ import ()
 
 // publish provides I/F for publishing output
 type publisher interface {
-	Publish(manifest []byte) error
+	Setup() error
+	Publish(name string, manifest []byte) error
 }
 
 // GetPublisher returns Publisher along w/ its Spec

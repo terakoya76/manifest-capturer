@@ -4,5 +4,11 @@ metadata:
   name: configmap-output
 spec:
   github:
-    repository: hoge
-    filePath: fuga
+    config:
+      repositoryUrl: https://github.com/terakoya76/manifest-test.git
+      baseBranch: master
+      manifestPath: configmap.yaml
+      author:
+        name: terakoya76
+        email: terako.studio@gmail.com
+    localFilePath: /tmp/coredns/
