@@ -1,0 +1,14 @@
+apiVersion: capturer.stable.example.com/v1alpha1
+kind: Output
+metadata:
+  name: deployment-github-output
+spec:
+  github:
+    config:
+      repositoryUrl: https://github.com/terakoya76/manifest-test.git
+      baseBranch: master
+      manifestPath: deployment.yaml
+      author:
+        name: terakoya76
+        email: terako.studio@gmail.com
+    localFilePath: /tmp/coredns/

@@ -1,0 +1,11 @@
+apiVersion: capturer.stable.example.com/v1alpha1
+kind: Capturer
+metadata:
+  name: configmap-capturer
+spec:
+  resourceKind: ConfigMap
+  resourceNamespace: kube-system
+  resourceName: coredns
+  outputs:
+    - configmap-github-output
+    - configmap-slack-output

@@ -1,0 +1,11 @@
+domain: stable.example.com
+multigroup: true
+repo: github.com/terakoya76/manifest-capturer
+resources:
+- group: capturer
+  kind: Capturer
+  version: v1alpha1
+- group: capturer
+  kind: Output
+  version: v1alpha1
+version: "2"

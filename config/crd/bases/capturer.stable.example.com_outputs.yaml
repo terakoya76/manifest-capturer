@@ -1,0 +1,100 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.5
+  creationTimestamp: null
+  name: outputs.capturer.stable.example.com
+spec:
+  group: capturer.stable.example.com
+  names:
+    kind: Output
+    listKind: OutputList
+    plural: outputs
+    singular: output
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      description: Output is the Schema for the outputs API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: OutputSpec defines the desired state of Output
+          properties:
+            github:
+              description: GitHubOutput defines the spec for integrating with GitHub
+              properties:
+                config:
+                  properties:
+                    author:
+                      properties:
+                        email:
+                          format: string
+                          type: string
+                        name:
+                          format: string
+                          type: string
+                      required:
+                      - email
+                      - name
+                      type: object
+                    baseBranch:
+                      format: string
+                      type: string
+                    manifestPath:
+                      format: string
+                      type: string
+                    repositoryUrl:
+                      format: string
+                      type: string
+                  required:
+                  - author
+                  - baseBranch
+                  - manifestPath
+                  - repositoryUrl
+                  type: object
+                localFilePath:
+                  format: string
+                  type: string
+              required:
+              - config
+              - localFilePath
+              type: object
+            slack:
+              description: SlackOutput defines the spec for integrating with GitHub
+              properties:
+                webhookUrl:
+                  format: string
+                  type: string
+              required:
+              - webhookUrl
+              type: object
+          type: object
+        status:
+          description: OutputStatus defines the observed state of Output
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
