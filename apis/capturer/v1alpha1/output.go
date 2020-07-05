@@ -16,8 +16,6 @@ limitations under the License.
 
 package v1alpha1
 
-import ()
-
 // publish provides I/F for publishing output
 type publisher interface {
 	Setup() error
