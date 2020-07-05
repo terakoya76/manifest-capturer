@@ -14,15 +14,15 @@ endif
 all: manager
 
 # Run tests
-test: generate fmt vet manifests
+test: generate lint manifests
 	go test ./... -coverprofile cover.out
 
 # Build manager binary
-manager: generate fmt vet
+manager: generate lint
 	go build -o bin/manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate fmt vet manifests
+run: generate lint manifests
 	go run ./main.go
 
 # Install CRDs into a cluster
@@ -42,13 +42,23 @@ deploy: manifests
 manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
-# Run go fmt against code
-fmt:
-	go fmt ./...
-
-# Run go vet against code
-vet:
-	go vet ./...
+# Run lint against code
+lint:
+	@if [ -z `which golangci-lint 2> /dev/null` ]; then \
+		GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0; \
+	fi
+	gofmt -s -w .
+	golangci-lint run --tests \
+		-D typecheck \
+		-E dupl \
+		-E goconst \
+		-E gofmt \
+		-E goimports \
+		-E gosec \
+		-E misspell \
+		-E stylecheck \
+		-E unparam \
+		--skip-files apis/*/*/zz_generated.deepcopy.go
 
 # Generate code
 generate: controller-gen

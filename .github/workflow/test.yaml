@@ -1,0 +1,26 @@
+name: test
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        go: [1.12, 1.13, 1.14]
+        os: [ubuntu-18.04, ubuntu-16.04]
+
+    name: all
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - name: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: test
+        run: make test
