@@ -12,7 +12,7 @@ You can specify a target `managed resource` in the Capturer CR, and manifest-cap
 
 The captured change will be delivered to the destination specified in the Output CR (typically GitHub), and kept as a snapshot.
 
-if the `managed resource` change has an unintended effect, you can use snapshots to investigate and recover from the failure.
+If the `managed resource` change has an unintended effect, you can use snapshots to investigate and recover from the failure.
 
 ## Quickstart
 ```bash
@@ -34,7 +34,7 @@ $ make run ENABLE_WEBHOOKS=false
 * Deployment
 * ConfigMap
 
-### Output to be published
+### Destination to be published
 * GitHub
 * Slack
 
