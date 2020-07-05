@@ -58,7 +58,8 @@ lint:
 		-E misspell \
 		-E stylecheck \
 		-E unparam \
-		--skip-files apis/*/*/zz_generated.deepcopy.go
+		--skip-files apis/*/*/zz_generated.deepcopy.go \
+		--timeout 10m
 
 # Generate code
 generate: controller-gen

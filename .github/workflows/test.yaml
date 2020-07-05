@@ -5,7 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
-        go: [1.12, 1.13, 1.14]
+        go: [1.13, 1.14]
         os: [ubuntu-18.04, ubuntu-16.04]
 
     name: all
@@ -22,5 +22,12 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+      - name: download kubebuilder
+        run: |
+          os=$(go env GOOS)
+          arch=$(go env GOARCH)
+          curl -L https://go.kubebuilder.io/dl/2.3.1/${os}/${arch} | tar -xz -C /tmp/
+          sudo mv /tmp/kubebuilder_2.3.1_${os}_${arch} /usr/local/kubebuilder
+          export PATH=$PATH:/usr/local/kubebuilder/bin
       - name: test
         run: make test
