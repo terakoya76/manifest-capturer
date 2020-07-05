@@ -26,6 +26,7 @@ import (
 
 // SlackOutput defines the spec for integrating with GitHub
 type SlackOutput struct {
+	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	WebhookURL string `json:"webhookUrl"`
