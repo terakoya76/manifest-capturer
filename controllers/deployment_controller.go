@@ -24,7 +24,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -62,13 +61,13 @@ func (r *DeploymentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, err
 	}
 
-	c, err := r.findCapture(&d)
+	c, err := r.findCapture(ctx, &d)
 	if err != nil {
-		log.Error(err, "failed to find Capture")
+		log.Error(err, "failed to find Capturer")
 		return ctrl.Result{}, err
 	}
 	if c == nil {
-		log.Info("unable to find Capture")
+		log.Info("unable to find Capturer")
 		return ctrl.Result{}, nil
 	}
 
@@ -78,42 +77,18 @@ func (r *DeploymentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	}
 	log.Info(string(manifest))
 
-	outputs := make(map[string]capturerv1alpha1.Output)
-	for _, outputName := range c.Spec.Outputs {
-		var output capturerv1alpha1.Output
-		if err = r.Get(context.TODO(),
-			types.NamespacedName{
-				Namespace: req.Namespace,
-				Name:      outputName,
-			},
-			&output,
-		); err != nil {
-			if errors.IsNotFound(err) {
-				log.Info("non exist Output %s is specified", outputName)
-				return ctrl.Result{}, nil
-			}
-
-			log.Error(err, "unable to find Output %s", outputName)
-			return ctrl.Result{}, err
-		}
-
-		outputs[outputName] = output
-	}
-
-	for outputName, output := range outputs {
-		if err := output.GetPublisher().Publish(outputName, manifest); err != nil {
-			log.Error(err, "unable to publish manifest")
-			return ctrl.Result{}, err
-		}
+	if err = publish(ctx, r, c, manifest); err != nil {
+		log.Info("unable to publish Capturer")
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
 }
 
-func (r *DeploymentReconciler) findCapture(d *appsv1.Deployment) (*capturerv1alpha1.Capturer, error) {
+func (r *DeploymentReconciler) findCapture(ctx context.Context, d *appsv1.Deployment) (*capturerv1alpha1.Capturer, error) {
 	caps := capturerv1alpha1.CapturerList{}
 	if err := r.List(
-		context.TODO(),
+		ctx,
 		&caps,
 	); err != nil {
 		return nil, err

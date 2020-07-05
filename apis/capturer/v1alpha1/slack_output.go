@@ -28,7 +28,7 @@ import (
 type SlackOutput struct {
 	// +kubebuilder:validation:Format:=string
 
-	WebhookUrl string `json:"webhookUrl"`
+	WebhookURL string `json:"webhookUrl"`
 }
 
 func (o *SlackOutput) Setup() error {
@@ -36,7 +36,7 @@ func (o *SlackOutput) Setup() error {
 }
 
 func (o *SlackOutput) Publish(name string, manifest []byte) (err error) {
-	url := o.WebhookUrl
+	url := o.WebhookURL
 
 	content := fmt.Sprintf(
 		"A capture is reported by manifest-capturer %s\n\n```%s```",

@@ -5,10 +5,10 @@ metadata:
 spec:
   github:
     config:
-      repositoryUrl: https://github.com/terakoya76/manifest-test.git
+      repositoryUrl: https://github.com/hoge/fuga.git
       baseBranch: master
       manifestPath: configmap.yaml
       author:
-        name: terakoya76
-        email: terako.studio@gmail.com
+        name: hoge
+        email: hoge@example.com
     localFilePath: /tmp/coredns/
