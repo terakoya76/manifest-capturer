@@ -72,33 +72,39 @@ func (r *DeploymentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, nil
 	}
 
-	outputName := c.Spec.Output
-	var output capturerv1alpha1.Output
-	if err = r.Get(context.TODO(),
-		types.NamespacedName{
-			Namespace: req.Namespace,
-			Name:      outputName,
-		},
-		&output,
-	); err != nil {
-		if errors.IsNotFound(err) {
-			log.Info("non exist output is specified")
-			return ctrl.Result{}, nil
-		}
-
-		log.Error(err, "unable to find Output")
-		return ctrl.Result{}, err
-	}
-
 	manifest, err := r.getManifest(&d)
 	if err != nil {
 		log.Error(err, "unable to fetch manifest")
 	}
-
 	log.Info(string(manifest))
-	if err := output.GetPublisher().Publish(outputName, manifest); err != nil {
-		log.Error(err, "unable to publish manifest")
-		return ctrl.Result{}, err
+
+	outputs := make(map[string]capturerv1alpha1.Output)
+	for _, outputName := range c.Spec.Outputs {
+		var output capturerv1alpha1.Output
+		if err = r.Get(context.TODO(),
+			types.NamespacedName{
+				Namespace: req.Namespace,
+				Name:      outputName,
+			},
+			&output,
+		); err != nil {
+			if errors.IsNotFound(err) {
+				log.Info("non exist Output %s is specified", outputName)
+				return ctrl.Result{}, nil
+			}
+
+			log.Error(err, "unable to find Output %s", outputName)
+			return ctrl.Result{}, err
+		}
+
+		outputs[outputName] = output
+	}
+
+	for outputName, output := range outputs {
+		if err := output.GetPublisher().Publish(outputName, manifest); err != nil {
+			log.Error(err, "unable to publish manifest")
+			return ctrl.Result{}, err
+		}
 	}
 
 	return ctrl.Result{}, nil

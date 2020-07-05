@@ -6,4 +6,6 @@ spec:
   resourceKind: ConfigMap
   resourceNamespace: kube-system
   resourceName: coredns
-  output: configmap-output
+  outputs:
+    - configmap-github-output
+    - configmap-slack-output

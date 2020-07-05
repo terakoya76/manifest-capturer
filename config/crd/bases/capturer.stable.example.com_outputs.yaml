@@ -73,8 +73,15 @@ spec:
               - config
               - localFilePath
               type: object
-          required:
-          - github
+            slack:
+              description: SlackOutput defines the spec for integrating with GitHub
+              properties:
+                webhookUrl:
+                  format: string
+                  type: string
+              required:
+              - webhookUrl
+              type: object
           type: object
         status:
           description: OutputStatus defines the observed state of Output

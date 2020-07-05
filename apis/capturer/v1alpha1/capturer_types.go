@@ -42,9 +42,8 @@ type CapturerSpec struct {
 	ResourceName string `json:"resourceName"`
 
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Format:=string
 
-	Output string `json:"output"`
+	Outputs []string `json:"outputs"`
 }
 
 // CapturerStatus defines the observed state of Capturer

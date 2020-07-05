@@ -46,43 +46,34 @@ func init() {
 
 // GitHubOutput defines the spec for integrating with GitHub
 type GitHubOutput struct {
-	// +kubebuilder:validation:Required
-
 	Config GitHubConfig `json:"config"`
 
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	LocalFilePath string `json:"localFilePath"`
 }
 
 type GitHubConfig struct {
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	RepositoryURL string `json:"repositoryUrl"`
 
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	BaseBranch string `json:"baseBranch"`
 
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	ManifestPath string `json:"manifestPath"`
 
-	// +kubebuilder:validation:Required
 	Author Author `json:"author"`
 }
 
 type Author struct {
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	Name string `json:"name"`
 
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
 	Email string `json:"email"`

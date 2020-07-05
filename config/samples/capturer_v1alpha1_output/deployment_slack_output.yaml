@@ -1,0 +1,7 @@
+apiVersion: capturer.stable.example.com/v1alpha1
+kind: Output
+metadata:
+  name: deployment-slack-output
+spec:
+  slack:
+    webhookUrl: https://hooks.slack.com/services/hoge/fuga

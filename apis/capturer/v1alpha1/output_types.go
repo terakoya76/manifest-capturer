@@ -25,7 +25,8 @@ import (
 
 // OutputSpec defines the desired state of Output
 type OutputSpec struct {
-	GitHub *GitHubOutput `json:"github"`
+	GitHub *GitHubOutput `json:"github,omitempty"`
+	Slack  *SlackOutput  `json:"slack,omitempty"`
 }
 
 // OutputStatus defines the observed state of Output

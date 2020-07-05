@@ -34,9 +34,10 @@ spec:
         spec:
           description: CapturerSpec defines the desired state of Capturer
           properties:
-            output:
-              format: string
-              type: string
+            outputs:
+              items:
+                type: string
+              type: array
             resourceKind:
               format: string
               type: string
@@ -47,7 +48,7 @@ spec:
               format: string
               type: string
           required:
-          - output
+          - outputs
           - resourceKind
           - resourceName
           - resourceNamespace

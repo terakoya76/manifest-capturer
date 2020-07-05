@@ -1,7 +1,7 @@
 apiVersion: capturer.stable.example.com/v1alpha1
 kind: Output
 metadata:
-  name: configmap-output
+  name: configmap-github-output
 spec:
   github:
     config:

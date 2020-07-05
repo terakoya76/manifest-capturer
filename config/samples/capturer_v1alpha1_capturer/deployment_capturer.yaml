@@ -6,4 +6,6 @@ spec:
   resourceKind: Deployment
   resourceNamespace: kube-system
   resourceName: coredns
-  output: deployment-output
+  outputs:
+    - deployment-github-output
+    - deployment-slack-output

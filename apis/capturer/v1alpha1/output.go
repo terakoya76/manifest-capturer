@@ -29,6 +29,8 @@ func (o *Output) GetPublisher() publisher {
 	switch {
 	case o.Spec.GitHub != nil:
 		return o.Spec.GitHub
+	case o.Spec.Slack != nil:
+		return o.Spec.Slack
 	}
 	return nil
 }
