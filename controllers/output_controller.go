@@ -25,14 +25,12 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	capturerv1alpha1 "github.com/terakoya76/manifest-capturer/apis/capturer/v1alpha1"
 )
 
-// OutputReconciler reconciles a Capturer object
-type OutputReconciler struct {
+// OutputController reconciles a Capturer object
+type OutputController struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
@@ -45,7 +43,7 @@ type OutputReconciler struct {
 // +kubebuilder:rbac:groups=,resources=configmaps,verbs=get;list;watch
 // +kubebuilder:rbac:groups=,resources=configmaps/status,verbs=get
 
-func (r *OutputReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *OutputController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
 	log := r.Log.WithValues("output", req.NamespacedName)
 
@@ -66,25 +64,11 @@ func (r *OutputReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *OutputReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	var p predicate.Predicate = predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool {
-			return true
-		},
-		DeleteFunc: func(e event.DeleteEvent) bool {
-			return true
-		},
-		UpdateFunc: func(e event.UpdateEvent) bool {
-			return e.MetaOld.GetGeneration() != e.MetaNew.GetGeneration()
-		},
-		GenericFunc: func(e event.GenericEvent) bool {
-			return false
-		},
-	}
+func (r *OutputController) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&capturerv1alpha1.Output{},
-			builder.WithPredicates(p),
+			builder.WithPredicates(Predicates),
 		).
 		Complete(r)
 }

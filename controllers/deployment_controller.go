@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
@@ -27,15 +26,10 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/yaml"
-
-	capturerv1alpha1 "github.com/terakoya76/manifest-capturer/apis/capturer/v1alpha1"
 )
 
-// DeploymentReconciler reconciles a Capturer object
-type DeploymentReconciler struct {
+// DeploymentController reconciles a Capturer object
+type DeploymentController struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
@@ -48,7 +42,7 @@ type DeploymentReconciler struct {
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch
 // +kubebuilder:rbac:groups=apps,resources=deployments/status,verbs=get
 
-func (r *DeploymentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *DeploymentController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
 	log := r.Log.WithValues("deployment", req.NamespacedName)
 
@@ -61,86 +55,21 @@ func (r *DeploymentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, err
 	}
 
-	c, err := r.findCapture(ctx, &d)
-	if err != nil {
-		log.Error(err, "failed to find Capturer")
-		return ctrl.Result{}, err
-	}
-	if c == nil {
-		log.Info("unable to find Capturer")
-		return ctrl.Result{}, nil
-	}
-
-	manifest, err := r.getManifest(&d)
-	if err != nil {
-		log.Error(err, "unable to fetch manifest")
-	}
-	log.Info(string(manifest))
-
-	if err = publish(ctx, r, c, manifest); err != nil {
-		log.Info("unable to publish Capturer")
+	resourceKind := "Deployment"
+	retry, err := capture(ctx, r, resourceKind, &d)
+	log.Error(err, "failed to capture")
+	if retry {
 		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
 }
 
-func (r *DeploymentReconciler) findCapture(ctx context.Context, d *appsv1.Deployment) (*capturerv1alpha1.Capturer, error) {
-	caps := capturerv1alpha1.CapturerList{}
-	if err := r.List(
-		ctx,
-		&caps,
-	); err != nil {
-		return nil, err
-	}
-
-	for _, c := range caps.Items {
-		if _, err := json.Marshal(c); err != nil {
-			return nil, err
-		}
-
-		if c.Spec.ResourceKind == "Deployment" &&
-			c.Spec.ResourceNamespace == d.GetNamespace() &&
-			c.Spec.ResourceName == d.GetName() {
-			return &c, nil
-		}
-	}
-
-	return nil, nil
-}
-
-func (r *DeploymentReconciler) getManifest(d *appsv1.Deployment) ([]byte, error) {
-	dc := d.DeepCopy()
-	dc.SetManagedFields(nil)
-	dc.Status.Reset()
-
-	manifest, err := yaml.Marshal(dc)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	return manifest, nil
-}
-
-func (r *DeploymentReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	var p predicate.Predicate = predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool {
-			return true
-		},
-		DeleteFunc: func(e event.DeleteEvent) bool {
-			return true
-		},
-		UpdateFunc: func(e event.UpdateEvent) bool {
-			return e.MetaOld.GetGeneration() != e.MetaNew.GetGeneration()
-		},
-		GenericFunc: func(e event.GenericEvent) bool {
-			return false
-		},
-	}
+func (r *DeploymentController) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&appsv1.Deployment{},
-			builder.WithPredicates(p),
+			builder.WithPredicates(Predicates),
 		).
 		Complete(r)
 }
