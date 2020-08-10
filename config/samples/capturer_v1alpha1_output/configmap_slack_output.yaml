@@ -4,4 +4,4 @@ metadata:
   name: configmap-slack-output
 spec:
   slack:
-    webhookUrl: https://hooks.slack.com/services/hoge/fuga
+    webhookUrl: $SLACK_WEBHOOK_URL

@@ -16,6 +16,36 @@ rules:
   - configmaps/status
   verbs:
   - get
+- resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- resources:
+  - secrets/status
+  verbs:
+  - get
+- resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+  - watch
+- resources:
+  - serviceaccounts/status
+  verbs:
+  - get
+- resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- resources:
+  - services/status
+  verbs:
+  - get
 - apiGroups:
   - apps
   resources:
@@ -28,6 +58,20 @@ rules:
   - apps
   resources:
   - deployments/status
+  verbs:
+  - get
+- apiGroups:
+  - capturer
+  resources:
+  - outputs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - capturer
+  resources:
+  - outputs/status
   verbs:
   - get
 - apiGroups:
@@ -60,3 +104,31 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - rbac
+  resources:
+  - clusterrolebindings
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rbac
+  resources:
+  - clusterrolebindings/status
+  verbs:
+  - get
+- apiGroups:
+  - rbac
+  resources:
+  - clusterroles
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rbac
+  resources:
+  - clusterroles/status
+  verbs:
+  - get

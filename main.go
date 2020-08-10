@@ -66,7 +66,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controller.OutputReconciler{
+	if err = (&controller.OutputController{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("OutputController"),
 		Scheme: mgr.GetScheme(),
@@ -74,7 +74,24 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "OutputController")
 		os.Exit(1)
 	}
-	if err = (&controller.ConfigMapReconciler{
+
+	if err = (&controller.ClusterRoleController{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("ClusterRoleController"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ClusterRoleController")
+		os.Exit(1)
+	}
+	if err = (&controller.ClusterRoleBindingController{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("ClusterRoleBindingController"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ClusterRoleBindingController")
+		os.Exit(1)
+	}
+	if err = (&controller.ConfigMapController{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("ConfigMapController"),
 		Scheme: mgr.GetScheme(),
@@ -82,12 +99,36 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "ConfigMapController")
 		os.Exit(1)
 	}
-	if err = (&controller.DeploymentReconciler{
+	if err = (&controller.DeploymentController{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("DeploymentController"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DeploymentController")
+		os.Exit(1)
+	}
+	if err = (&controller.SecretController{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("SecretController"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SecretController")
+		os.Exit(1)
+	}
+	if err = (&controller.ServiceController{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("ServiceController"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ServiceController")
+		os.Exit(1)
+	}
+	if err = (&controller.ServiceAccountCountroller{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("ServiceAccountCountroller"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ServiceAccountCountroller")
 		os.Exit(1)
 	}
 

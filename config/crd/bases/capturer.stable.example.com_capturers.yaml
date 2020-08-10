@@ -34,6 +34,9 @@ spec:
         spec:
           description: CapturerSpec defines the desired state of Capturer
           properties:
+            namespacedResource:
+              format: bool
+              type: boolean
             outputs:
               items:
                 type: string
@@ -48,10 +51,10 @@ spec:
               format: string
               type: string
           required:
+          - namespacedResource
           - outputs
           - resourceKind
           - resourceName
-          - resourceNamespace
           type: object
         status:
           description: CapturerStatus defines the observed state of Capturer

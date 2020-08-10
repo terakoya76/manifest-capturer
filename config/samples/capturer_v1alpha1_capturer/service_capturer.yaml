@@ -1,12 +1,12 @@
 apiVersion: capturer.stable.example.com/v1alpha1
 kind: Capturer
 metadata:
-  name: deployment-capturer
+  name: service-capturer
 spec:
   namespacedResource: true
-  resourceKind: Deployment
+  resourceKind: Service
   resourceNamespace: kube-system
-  resourceName: coredns
+  resourceName: kube-dns
   outputs:
-    - deployment-github-output
-    - deployment-slack-output
+    - service-github-output
+    - service-slack-output

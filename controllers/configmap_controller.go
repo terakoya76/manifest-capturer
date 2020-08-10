@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -27,15 +26,10 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/yaml"
-
-	capturerv1alpha1 "github.com/terakoya76/manifest-capturer/apis/capturer/v1alpha1"
 )
 
-// ConfigMapReconciler reconciles a Capturer object
-type ConfigMapReconciler struct {
+// ConfigMapController reconciles a Capturer object
+type ConfigMapController struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
@@ -48,9 +42,9 @@ type ConfigMapReconciler struct {
 // +kubebuilder:rbac:groups=,resources=configmaps,verbs=get;list;watch
 // +kubebuilder:rbac:groups=,resources=configmaps/status,verbs=get
 
-func (r *ConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *ConfigMapController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
-	log := r.Log.WithValues("configmap", req.NamespacedName)
+	log := r.Log.WithValues("configmaps", req.NamespacedName)
 
 	var cm corev1.ConfigMap
 	if err := r.Get(ctx, req.NamespacedName, &cm); err != nil {
@@ -61,85 +55,25 @@ func (r *ConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	c, err := r.findCapture(&cm)
+	resourceKind := "ConfigMap"
+	retry, err := capture(ctx, r, resourceKind, &cm)
 	if err != nil {
-		log.Error(err, "failed to find Capturer")
-		return ctrl.Result{}, err
-	}
-	if c == nil {
-		log.Info("unable to find Capturer")
-		return ctrl.Result{}, nil
-	}
+		log.Error(err, "failed to capture")
 
-	manifest, err := r.getManifest(&cm)
-	if err != nil {
-		log.Error(err, "unable to fetch manifest")
-	}
-	log.Info(string(manifest))
-
-	if err = publish(ctx, r, c, manifest); err != nil {
-		log.Info("unable to publish Capturer")
-		return ctrl.Result{}, err
+		if retry {
+			return ctrl.Result{}, err
+		}
 	}
 
 	return ctrl.Result{}, nil
 }
 
-func (r *ConfigMapReconciler) findCapture(cm *corev1.ConfigMap) (*capturerv1alpha1.Capturer, error) {
-	caps := capturerv1alpha1.CapturerList{}
-	if err := r.List(
-		context.TODO(),
-		&caps,
-	); err != nil {
-		return nil, err
-	}
-
-	for _, c := range caps.Items {
-		if _, err := json.Marshal(c); err != nil {
-			return nil, err
-		}
-
-		if c.Spec.ResourceKind == "ConfigMap" &&
-			c.Spec.ResourceNamespace == cm.GetNamespace() &&
-			c.Spec.ResourceName == cm.GetName() {
-			return &c, nil
-		}
-	}
-
-	return nil, nil
-}
-
-func (r *ConfigMapReconciler) getManifest(cm *corev1.ConfigMap) ([]byte, error) {
-	cmc := cm.DeepCopy()
-	cmc.SetManagedFields(nil)
-
-	manifest, err := yaml.Marshal(cmc)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	return manifest, nil
-}
-
-func (r *ConfigMapReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	var p predicate.Predicate = predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool {
-			return true
-		},
-		DeleteFunc: func(e event.DeleteEvent) bool {
-			return true
-		},
-		UpdateFunc: func(e event.UpdateEvent) bool {
-			return true
-		},
-		GenericFunc: func(e event.GenericEvent) bool {
-			return false
-		},
-	}
+func (r *ConfigMapController) SetupWithManager(mgr ctrl.Manager) error {
+	haveGeneration := false
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&corev1.ConfigMap{},
-			builder.WithPredicates(p),
+			builder.WithPredicates(Predicates(haveGeneration)),
 		).
 		Complete(r)
 }
