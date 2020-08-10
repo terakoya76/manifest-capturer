@@ -43,6 +43,9 @@ $EOF
 )\"" > configmap_slack_output.yaml
 $ kubectl apply -f configmap_slack_output.yaml -n kube-system
 
+# need github output authentication
+$ export GITHUB_ACCESS_TOKEN=xxxxx
+
 # run manifest-capturer controller
 $ make run ENABLE_WEBHOOKS=false
 
