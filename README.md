@@ -21,22 +21,48 @@ $ minikube start
 # register CRD on schema
 $ make install
 
-# deploy sample CRs on your cluster
-$ kubectl apply -f config/samples/capturer_v1alpha1_capturer/configmap_capturer.yaml -n kube-system
-$ kubectl apply -f config/samples/capturer_v1alpha1_output/configmap_github_output.yaml -n kube-system
+# deploy sample CRs on your cluster (ConfigMap)
+## capturer
+$ kubectl apply -f config/samples/capturer_v1alpha1_output/configmap_capturer.yaml -n kube-system
+
+## output for github
+$ YOURNAME=yourname
+$ REPONAME=reponame
+$ YOUREMAIL=youremail@example.com
+$ eval echo "\"$(cat <<$EOF
+$(<config/samples/capturer_v1alpha1_output/configmap_github_output.yaml)
+$EOF
+)\"" > configmap_github_output.yaml
+$ kubectl apply -f configmap_github_output.yaml -n kube-system
+
+## output for slack
+$ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxxxx/yyyyy
+$ eval echo "\"$(cat <<$EOF
+$(<config/samples/capturer_v1alpha1_output/configmap_slack_output.yaml)
+$EOF
+)\"" > configmap_slack_output.yaml
+$ kubectl apply -f configmap_slack_output.yaml -n kube-system
 
 # run manifest-capturer controller
 $ make run ENABLE_WEBHOOKS=false
+
+# edit ConfigMap
+$ kubectl edit cm coredns -n kube-system
 ```
 
 ## Supported
 ### Resource to be captured
-* Deployment
+* ClusterRole
+* ClusterRoleBinding
 * ConfigMap
+* Deployment
+* Secret
+* Service
+* ServiceAccount
 
 ### Destination to be published
 * GitHub
 * Slack
 
 ## Examples
-Check out the [config/sample](https://github.com/terakoya76/manifest-capturer/config/samples) directory to see some examples
+Check out the [config/sample](https://github.com/terakoya76/manifest-capturer/tree/master/config) directory to see some examples

@@ -5,10 +5,10 @@ metadata:
 spec:
   github:
     config:
-      repositoryUrl: https://github.com/yourname/reponame.git
+      repositoryUrl: https://github.com/$YOURNAME/$REPONAME.git
       baseBranch: master
       manifestPath: service.yaml
       author:
-        name: hoge
-        email: hoge@example.com
+        name: $YOURNAME
+        email: $YOUREMAIL
     localFilePath: /tmp/coredns/

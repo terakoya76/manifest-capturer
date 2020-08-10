@@ -50,7 +50,7 @@ lint:
 	gofmt -s -w .
 	golangci-lint run --tests \
 		-D typecheck \
-		-E dupl \
+		-D dupl \
 		-E goconst \
 		-E gofmt \
 		-E goimports \
