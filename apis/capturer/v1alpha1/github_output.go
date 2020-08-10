@@ -153,6 +153,10 @@ func (o *GitHubOutput) clone() error {
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 	})
 	if err != nil {
+		if err.Error() == git.ErrRepositoryAlreadyExists.Error() {
+			return nil
+		}
+
 		githubOutputLog.Error(err, "failed `git clone %s %s --recursive`", url, directory)
 		return err
 	}
