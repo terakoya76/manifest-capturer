@@ -1,13 +1,13 @@
 apiVersion: capturer.stable.example.com/v1alpha1
 kind: Output
 metadata:
-  name: deployment-github-output
+  name: clusterrolebinding-github-output
 spec:
   github:
     config:
       repositoryUrl: https://github.com/yourname/reponame.git
       baseBranch: master
-      manifestPath: deployment.yaml
+      manifestPath: clusterrolebinding.yaml
       author:
         name: hoge
         email: hoge@example.com

@@ -3,6 +3,7 @@ kind: Capturer
 metadata:
   name: configmap-capturer
 spec:
+  namespacedResource: true
   resourceKind: ConfigMap
   resourceNamespace: kube-system
   resourceName: coredns

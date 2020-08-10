@@ -5,7 +5,7 @@ metadata:
 spec:
   github:
     config:
-      repositoryUrl: https://github.com/hoge/fuga.git
+      repositoryUrl: https://github.com/yourname/reponame.git
       baseBranch: master
       manifestPath: configmap.yaml
       author:

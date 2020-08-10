@@ -44,7 +44,7 @@ type ConfigMapController struct {
 
 func (r *ConfigMapController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
-	log := r.Log.WithValues("configmap", req.NamespacedName)
+	log := r.Log.WithValues("configmaps", req.NamespacedName)
 
 	var cm corev1.ConfigMap
 	if err := r.Get(ctx, req.NamespacedName, &cm); err != nil {
@@ -57,19 +57,23 @@ func (r *ConfigMapController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	resourceKind := "ConfigMap"
 	retry, err := capture(ctx, r, resourceKind, &cm)
-	log.Error(err, "failed to capture")
-	if retry {
-		return ctrl.Result{}, err
+	if err != nil {
+		log.Error(err, "failed to capture")
+
+		if retry {
+			return ctrl.Result{}, err
+		}
 	}
 
 	return ctrl.Result{}, nil
 }
 
 func (r *ConfigMapController) SetupWithManager(mgr ctrl.Manager) error {
+	haveGeneration := false
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&corev1.ConfigMap{},
-			builder.WithPredicates(Predicates),
+			builder.WithPredicates(Predicates(haveGeneration)),
 		).
 		Complete(r)
 }

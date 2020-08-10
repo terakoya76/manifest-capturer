@@ -27,14 +27,19 @@ import (
 // CapturerSpec defines the desired state of Capturer
 type CapturerSpec struct {
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Format:=string
+	// +kubebuilder:validation:Format:=bool
 
-	ResourceKind string `json:"resourceKind"`
+	NamespacedResource bool `json:"namespacedResource"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string
 
-	ResourceNamespace string `json:"resourceNamespace"`
+	ResourceKind string `json:"resourceKind"`
+
+	// *kubebuilder:validation:Optional
+	// +kubebuilder:validation:Format:=string
+
+	ResourceNamespace string `json:"resourceNamespace,omitempty"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Format:=string

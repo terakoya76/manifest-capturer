@@ -4,4 +4,4 @@ metadata:
   name: deployment-slack-output
 spec:
   slack:
-    webhookUrl: https://hooks.slack.com/services/hoge/fuga
+    webhookUrl: https://hooks.slack.com/services/xxxx/yyyy

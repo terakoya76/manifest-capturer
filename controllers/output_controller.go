@@ -40,8 +40,8 @@ type OutputController struct {
 // +kubebuilder:rbac:groups=capturer.stable.example.com,resources=capturers/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=capturer.stable.example.com,resources=outputs,verbs=get;list
 // +kubebuilder:rbac:groups=capturer.stable.example.com,resources=outputs/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=,resources=configmaps,verbs=get;list;watch
-// +kubebuilder:rbac:groups=,resources=configmaps/status,verbs=get
+// +kubebuilder:rbac:groups=capturer,resources=outputs,verbs=get;list;watch
+// +kubebuilder:rbac:groups=capturer,resources=outputs/status,verbs=get
 
 func (r *OutputController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
@@ -65,10 +65,11 @@ func (r *OutputController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 }
 
 func (r *OutputController) SetupWithManager(mgr ctrl.Manager) error {
+	haveGeneration := false
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&capturerv1alpha1.Output{},
-			builder.WithPredicates(Predicates),
+			builder.WithPredicates(Predicates(haveGeneration)),
 		).
 		Complete(r)
 }

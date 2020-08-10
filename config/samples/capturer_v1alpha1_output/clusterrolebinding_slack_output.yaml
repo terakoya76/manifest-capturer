@@ -1,7 +1,7 @@
 apiVersion: capturer.stable.example.com/v1alpha1
 kind: Output
 metadata:
-  name: configmap-slack-output
+  name: clusterrolebinding-slack-output
 spec:
   slack:
     webhookUrl: https://hooks.slack.com/services/xxxx/yyyy

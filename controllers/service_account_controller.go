@@ -20,7 +20,7 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -28,8 +28,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// DeploymentController reconciles a Capturer object
-type DeploymentController struct {
+// ServiceAccountCountroller reconciles a Capturer object
+type ServiceAccountCountroller struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
@@ -39,15 +39,15 @@ type DeploymentController struct {
 // +kubebuilder:rbac:groups=capturer.stable.example.com,resources=capturers/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=capturer.stable.example.com,resources=outputs,verbs=get;list
 // +kubebuilder:rbac:groups=capturer.stable.example.com,resources=outputs/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch
-// +kubebuilder:rbac:groups=apps,resources=deployments/status,verbs=get
+// +kubebuilder:rbac:groups=,resources=serviceaccounts,verbs=get;list;watch
+// +kubebuilder:rbac:groups=,resources=serviceaccounts/status,verbs=get
 
-func (r *DeploymentController) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *ServiceAccountCountroller) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
-	log := r.Log.WithValues("deployments", req.NamespacedName)
+	log := r.Log.WithValues("serviceaccounts", req.NamespacedName)
 
-	var d appsv1.Deployment
-	if err := r.Get(ctx, req.NamespacedName, &d); err != nil {
+	var sa corev1.ServiceAccount
+	if err := r.Get(ctx, req.NamespacedName, &sa); err != nil {
 		if errors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
@@ -55,8 +55,8 @@ func (r *DeploymentController) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		return ctrl.Result{}, err
 	}
 
-	resourceKind := "Deployment"
-	retry, err := capture(ctx, r, resourceKind, &d)
+	resourceKind := "ServiceAccount"
+	retry, err := capture(ctx, r, resourceKind, &sa)
 	if err != nil {
 		log.Error(err, "failed to capture")
 
@@ -66,13 +66,14 @@ func (r *DeploymentController) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	}
 
 	return ctrl.Result{}, nil
+
 }
 
-func (r *DeploymentController) SetupWithManager(mgr ctrl.Manager) error {
-	haveGeneration := true
+func (r *ServiceAccountCountroller) SetupWithManager(mgr ctrl.Manager) error {
+	haveGeneration := false
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
-			&appsv1.Deployment{},
+			&corev1.ServiceAccount{},
 			builder.WithPredicates(Predicates(haveGeneration)),
 		).
 		Complete(r)
