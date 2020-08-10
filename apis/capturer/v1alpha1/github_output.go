@@ -36,6 +36,7 @@ var (
 	once            = new(sync.Once)
 
 	personalAccessToken string
+	mu                  sync.Mutex
 )
 
 func init() {
@@ -90,7 +91,20 @@ type Author struct {
 }
 
 func (o *GitHubOutput) Setup() error {
-	return o.clone()
+	if err := o.clone(); err != nil {
+		return err
+	}
+
+	r, err := o.open()
+	if err != nil {
+		return err
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	bb := o.Config.BaseBranch
+	return o.checkout(r, bb)
 }
 
 func (o *GitHubOutput) Publish(name string, manifest []byte) (err error) {
@@ -98,6 +112,9 @@ func (o *GitHubOutput) Publish(name string, manifest []byte) (err error) {
 	if err != nil {
 		return err
 	}
+
+	mu.Lock()
+	defer mu.Unlock()
 
 	if err = o.pull(r); err != nil {
 		return err
