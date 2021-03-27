@@ -10,8 +10,8 @@ jobs:
   build:
     strategy:
       matrix:
-        go: [1.13, 1.14]
-        os: [ubuntu-16.04, ubuntu-18.04]
+        go: [1.14, 1.15]
+        os: [ubuntu-18.04, ubuntu-20.04]
 
     name: all
     runs-on: ${{ matrix.os }}
