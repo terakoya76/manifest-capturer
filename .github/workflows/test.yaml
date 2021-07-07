@@ -17,9 +17,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
+
       - uses: actions/cache@v2
         id: cache-go-sum
         with:
@@ -27,15 +29,12 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
       - name: download dependencies
         if: steps.cache-go-sum.outputs.cache-hit != 'true'
         run: go mod download
-      - name: download kubebuilder
-        run: |
-          os=$(go env GOOS)
-          arch=$(go env GOARCH)
-          curl -L https://go.kubebuilder.io/dl/2.3.1/${os}/${arch} | tar -xz -C /tmp/
-          sudo mv /tmp/kubebuilder_2.3.1_${os}_${arch} /usr/local/kubebuilder
-          export PATH=$PATH:/usr/local/kubebuilder/bin
+
+      - uses: RyanSiu1995/kubebuilder-action@v1.2
+
       - name: test
         run: make test
