@@ -34,6 +34,11 @@ jobs:
         if: steps.cache-go-sum.outputs.cache-hit != 'true'
         run: go mod download
 
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.29
+
       - uses: RyanSiu1995/kubebuilder-action@v1.2
 
       - name: test
