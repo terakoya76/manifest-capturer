@@ -4,9 +4,9 @@ go 1.14
 
 require (
 	github.com/go-git/go-git/v5 v5.2.0
-	github.com/go-logr/logr v0.1.0
-	github.com/onsi/ginkgo v1.15.2
-	github.com/onsi/gomega v1.10.1
+	github.com/go-logr/logr v1.2.3
+	github.com/onsi/ginkgo v1.16.4
+	github.com/onsi/gomega v1.24.1
 	k8s.io/api v0.18.2
 	k8s.io/apimachinery v0.18.2
 	k8s.io/client-go v0.18.2
